@@ -1,4 +1,6 @@
-from .resources import LoginResource, SingleUserResource, UserResource
+from .resources import (
+    LoginResource, SingleUserResource, UserResource,
+)
 
 
 routes = [

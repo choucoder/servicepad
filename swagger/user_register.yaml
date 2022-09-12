@@ -1,0 +1,70 @@
+summary: "Register an User"
+description: "This is an API for create an User."
+consumes:
+- "application/json"
+produces:
+- "application/json"
+parameters:
+  - name: body
+    in: body
+    required: true
+    schema:
+      id: UserSchema
+      required:
+        - fullname
+        - email
+        - password
+      properties:
+        fullname:
+          type: string
+          description: Name + Lastname of the user
+        email:
+          type: string
+          description: The user's email
+        password:
+          type: string
+          description: The user's password
+      example: {'fullname': 'Jose Chourio', 'email': 'jchouriopirela@gmail.com', 'password': 'calamardo', 'photo': 'b64photo'}
+responses:
+  201:
+    description: Registration successfully
+    schema:
+      id: UserDumpSchema
+      properties:
+        id:
+          type: integer
+          description: User id
+        fullname:
+          type: string
+          description: Name + Lastname of the user
+        email:
+          type: string
+          description: The user's email
+        photo:
+          type: string
+          description: User photo url
+  422:
+    description: Email is already registered
+    schema:
+      id: Response
+      properties:
+        message:
+          type: string
+          description: User already exists. Log in
+  400:
+    description: Missing required fields
+    schema:
+      id: ValidationError
+      properties:
+        message:
+          type: string
+          description: Message
+        fields:
+          type: array
+          items:
+            type: object
+            example: {
+              'field': 'Field validation error'
+            }
+            description: Error for each field
+          description: Errors for each field

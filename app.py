@@ -1,4 +1,5 @@
 from decouple import config
+from flasgger import Swagger
 from flask import Flask
 from flask_migrate import Migrate
 
@@ -8,6 +9,18 @@ from v1.routes import routes
  
 
 app = Flask(__name__)
+
+SWAGGER_TEMPLATE = {
+    "securityDefinitions": {
+        "APIKeyHeader": {
+            "type": "apiKey",
+            "name": "x-access-token",
+            "in": "header"
+        }
+    }
+}
+
+swagger = Swagger(app, template=SWAGGER_TEMPLATE)
 api = CustomApi(app)
 
 api.add_resources(routes)

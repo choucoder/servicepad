@@ -1,5 +1,6 @@
 import json
 
+from flasgger.utils import swag_from
 from flask import request, Response, make_response, send_from_directory
 from flask_restful import Resource
 from werkzeug.security import (
@@ -9,15 +10,22 @@ from werkzeug.security import (
 from .models import User
 from .schemas import UserSchema, LoginSchema
 from core.auth import get_token, get_user_by_token, token_required
+from core.utils import save_picture
 from database.connection import db
 
 
 class LoginResource(Resource):
+    """Login Resource class
+    
+    Endpoint: /users/login
+    """
     def __init__(self) -> None:
         super().__init__()
         self.loginSchema = LoginSchema()
     
+    @swag_from('../../swagger/user_login.yaml')
     def post(self):
+        """Login POST method for User authentication"""
         form = json.loads(request.data, strict=False)
         form, error = self.loginSchema.verify(form)
 
@@ -37,7 +45,11 @@ class LoginResource(Resource):
         
         if check_password_hash(user.password, form['password']):
             token = get_token(user)
-            response = make_response({'token': token})
+            response = make_response({
+                'id': user.id,
+                'fullname': user.fullname,
+                'token': token
+            })
             response.set_cookie("x-access-token", token)
             return response
 
@@ -49,14 +61,19 @@ class LoginResource(Resource):
 
 
 class UserResource(Resource):
+    """User Resource for create and list User
+
+    Endpoint: /users
+    """
     def __init__(self) -> None:
         super().__init__()
         self.schemas = {}
         self.schemas['create'] = UserSchema()
         self.schemas['list'] = UserSchema(many=True)
     
+    @swag_from('../../swagger/user_register.yaml')
     def post(self):
-        print(request.json)
+        """Create a User"""
         form = json.loads(request.data, strict=False)
         form, error = UserSchema().verify(form)
 
@@ -68,12 +85,16 @@ class UserResource(Resource):
         user = User.query.filter_by(email=form['email']).first()
 
         if not user:
-            print(form)
             password = generate_password_hash(form.pop('password'))
+            b64image = form.pop('photo')
+            filename = save_picture(b64image)
+
             user = User(
                 **form,
+                photo=filename,
                 password=password
             )
+            
             db.session.add(user)
             db.session.commit()
             return Response(
@@ -84,12 +105,14 @@ class UserResource(Resource):
         else:
             return Response(
                 json.dumps({'message': 'User already exists. Log in'}),
-                status=400,
+                status=422,
                 mimetype='application/json'
             )
 
     @token_required
+    @swag_from('../../swagger/user_list.yaml')
     def get(self):
+        """List all registered users"""
         users = User.query.order_by(User.id).all()
         results = self.schemas['list'].dumps(users)
 
@@ -101,17 +124,39 @@ class UserResource(Resource):
 
 
 class SingleUserResource(Resource):
-    
+    """SingleUser Resource for get user details, update and
+    delete an User
+
+    Endpoint: /users/{id}
+    """
     def __init__(self) -> None:
         super().__init__()
         self.schema = UserSchema()
 
     def check_permission(self, headers, user) -> bool:
+        """Check if the current user has permission for update or delete
+        a given user
+
+        Parameters
+        ---
+            headers: Dict of http headers
+            user: User object
+
+        Return True if the current_user is equal to the user given user,
+        otherwise return False
+        """
         current_user = get_user_by_token(headers)
         return current_user.id == user.id
     
     @token_required
+    @swag_from('../../swagger/user_details.yaml')
     def get(self, id):
+        """Get User details for a given User id
+        
+        Parameters
+        ---
+            id: User id
+        """
         user = User.query.get_or_404(id, description="User not found")
         result = json.loads(self.schema.dumps(user))
 
@@ -121,7 +166,14 @@ class SingleUserResource(Resource):
         )
 
     @token_required
+    @swag_from('../../swagger/user_partial_update.yaml')
     def patch(self, id):
+        """Partially update a user for a given User id
+        
+        Parameters
+        ---
+            id: User id
+        """
         user = User.query.get_or_404(id, description="User not found")
         
         if not self.check_permission(request.headers, user):
@@ -157,7 +209,14 @@ class SingleUserResource(Resource):
         )
 
     @token_required
+    @swag_from('../../swagger/user_update.yaml')
     def put(self, id):
+        """Update a user for a given User id
+        
+        Parameters
+        ---
+            id: User id
+        """
         user = User.query.get_or_404(id, description="User not found")
         if not self.check_permission(request.headers, user):
             return Response(
@@ -191,11 +250,18 @@ class SingleUserResource(Resource):
         ) 
     
     @token_required
+    @swag_from('../../swagger/user_delete.yaml')
     def delete(self, id):
+        """Delete a user for a given User id
+        
+        Parameters
+        ---
+            id: User id
+        """
         user = User.query.get_or_404(id, description="User not found")
         if not self.check_permission(request.headers, user):
             return Response(
-                json.dumps({'message': "You can not update this user"}),
+                json.dumps({'message': "You cannot delete this user"}),
                 status=403,
                 mimetype='application/json'
             )

@@ -1,0 +1,27 @@
+summary: "List all the publications"
+description: "This is an API for list all the publications stored"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+security:
+- APIKeyHeader: ['x-access-token']
+responses:
+  200:
+    description: List of all publications
+    schema:
+      id: PublicationListSchema
+      properties:
+        data:
+          type: array
+          description: Publications
+          items:
+            schema:
+              id: PublicationDumpSchema
+  401:
+    description: Unauthorized, token is missing
+    schema:
+      properties:
+        message:
+          type: string
+          description: Message

@@ -1,0 +1,67 @@
+summary: "Partial update for a specific field of an user"
+description: "This is an API for partial update for a specific field of an user"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+security:
+- APIKeyHeader: ['x-access-token']
+parameters:
+- in: path
+  name: id
+  schema:
+    type: integer
+  required: true
+  description: User id
+- in: body
+  name: body
+  required: true
+  schema:
+    id: UserSchema
+responses:
+  200:
+    description: User has been updated
+    schema:
+      id: UserDumpSchema
+
+  400:
+    description: Missing required fields or Email is already taken
+    schema:
+      id: ValidationError
+      properties:
+        message:
+          type: string
+          description: Message
+        fields:
+          type: array
+          items:
+            type: object
+            example: {
+              'field': 'Field validation error'
+            }
+            description: Error for each field
+          description: Errors for each field
+  
+  401:
+    description: Unauthorized, missing token
+    schema:
+      properties:
+        message:
+          type: string
+          description: Unauthorized, token is missing
+
+  403:
+    description: Unauthorized, you don't have permission to perform this operation
+    schema:
+      properties:
+        message:
+          type: string
+          description: Unauthorized for update this user
+
+  404:
+    description: User is not registered
+    schema:
+      properties:
+        message:
+          type: string
+          description: Message

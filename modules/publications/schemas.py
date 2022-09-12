@@ -7,12 +7,16 @@ from ..users.schemas import UserSchema
 
 
 class PublicationSchema(BaseSchema):
+    """Publication Schema class for validate Publication Creation
+    and partial Update. Also it's used for serialize Publication
+    objects into json
+    """
     id = fields.Int(dump_only=True)
     title = fields.Str(
         validate=validate.Length(max=128), required=True
     )
     description = fields.Str(
-        validate=validate.Length(max=512), required=False
+        validate=validate.Length(max=512), required=True
     )
     priority = fields.Str(
         validate=validate.OneOf(["NORMAL", "URGENT"]),
@@ -29,10 +33,15 @@ class PublicationSchema(BaseSchema):
 
     posted_ago = fields.Method("get_time_ago", dump_only=True)
 
-    def get_time_ago(self, user):
+    def get_time_ago(self, post):
+        """Compute and return the time since a post has been published
+        (seconds, minutes, hours, days, weeks, months, years)
+
+        Parameters
+        ---
+        post: A publication model object 
         """
-        """
-        diff = datetime.utcnow() - user.created_at
+        diff = datetime.utcnow() - post.created_at
         years = diff.days // 365
         months = diff.days // 30
         weeks = diff.days // 7
@@ -70,3 +79,21 @@ class PublicationSchema(BaseSchema):
 
     class Meta:
         ordered = True
+
+
+class PublicationUpdateSchema(PublicationSchema):
+    """PublicationUpdate Schema class for validate Publication Update"""
+    title = fields.Str(
+        validate=validate.Length(max=128), required=True
+    )
+    description = fields.Str(
+        validate=validate.Length(max=512), required=True
+    )
+    priority = fields.Str(
+        validate=validate.OneOf(["NORMAL", "URGENT"]),
+        required=True
+    )
+    status = fields.Str(
+        validate=validate.OneOf(["1"]),
+        required=True
+    )

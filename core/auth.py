@@ -10,7 +10,10 @@ import jwt
 from modules.users.models import User
 
 
+SECRET_KEY = config('SECRET_KEY')
+
 def token_required(func):
+    """Decorator for validate that a token is passed in the headers"""
     @wraps(func)
     def decorated(*args, **kwargs):
         token = None
@@ -25,11 +28,9 @@ def token_required(func):
             )
 
         try:
-            data = jwt.decode(token, config('SECRET_KEY'), algorithms=["HS256"])
-            # TODO use just get for throw an exception if id does not exist
+            data = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
             user = User.query\
-                .filter_by(id = data['id'])\
-                .first()
+                .get_or_404(data['id'])
         except Exception as e:
             return Response(
                 json.dumps({'message': 'Token is invalid'}),
@@ -42,15 +43,29 @@ def token_required(func):
 
 
 def get_user_by_token(headers: Dict) -> User:
-    data = jwt.decode(headers['x-access-token'], config('SECRET_KEY'),
+    """Function to obtain the current user given the token
+    
+    Parameters
+    ---
+    headers: Http headers for get the x-access-token.
+
+    Return the current user
+    """
+    data = jwt.decode(headers['x-access-token'], SECRET_KEY,
                       algorithms=["HS256"])
     user = User.query.filter_by(id = data['id']).first()
     return user
 
 
 def get_token(user: User) -> Dict:
+    """Create and return a json web token
+    
+    Parameters
+    ---
+    user: User
+    """
     token = jwt.encode({
         'id': user.id,
         'exp': datetime.utcnow() + timedelta(minutes=45)
-    }, config('SECRET_KEY'), algorithm="HS256")
+    }, SECRET_KEY, algorithm="HS256")
     return token

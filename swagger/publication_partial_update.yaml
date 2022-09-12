@@ -1,0 +1,67 @@
+summary: "Partial update for a specific field of a publication"
+description: "This is an API for partial update for a specific field of a publication"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+security:
+- APIKeyHeader: ['x-access-token']
+parameters:
+- in: path
+  name: id
+  schema:
+    type: integer
+  required: true
+  description: Id of the publication
+- in: body
+  name: body
+  required: true
+  schema:
+    id: PublicationSchema
+responses:
+  200:
+    description: Publication has been updated
+    schema:
+      id: PublicationDumpSchema
+
+  400:
+    description: Missing required fields or email is already taken
+    schema:
+      id: ValidationError
+      properties:
+        message:
+          type: string
+          description: Message
+        fields:
+          type: array
+          items:
+            type: object
+            example: {
+              'field': 'Field validation error'
+            }
+            description: Error for each field
+          description: Errors for each field
+  
+  401:
+    description: Unauthorized, missing token
+    schema:
+      properties:
+        message:
+          type: string
+          description: Unauthorized, token is missing
+
+  403:
+    description: Unauthorized, you don't have permission to perform this operation
+    schema:
+      properties:
+        message:
+          type: string
+          description: Unauthorized for update this post
+
+  404:
+    description: Publication is not registered
+    schema:
+      properties:
+        message:
+          type: string
+          description: Message

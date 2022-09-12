@@ -1,0 +1,101 @@
+summary: "Create a publication for the logged user"
+description: "This is an API for create a Publication for the current logged user"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+security:
+- APIKeyHeader: ['x-access-token']
+parameters:
+  - name: body
+    in: body
+    required: true
+    schema:
+      id: PublicationSchema
+      required:
+        - title
+        - description
+      properties:
+        title:
+          type: string
+          description: The publication's title
+        description:
+          type: string
+          description: The publication's description
+        priority:
+          type: string
+          description: The publication's priority ('NORMAL', 'URGENT')
+        status:
+          type: string
+          description: The publication's status ('1',)
+      example: {
+        'title': 'My first post',
+        'description': 'This is my first post with my user',
+        'priority': 'NORMAL',
+        'status': '1'
+      }
+responses:
+  201:
+    description: Post created Successfully
+    schema:
+      id: PublicationDumpSchema
+      properties:
+        id:
+          type: integer
+          description: Publication id
+        title:
+          type: string
+          description: Publication title
+        description:
+          type: string
+          description: Publication description
+        priority:
+          type: string
+          description: Publication priority
+        status:
+          type: string
+          description: Publication status
+        user:
+          type: object
+          description: User who did the post
+          example: {
+            'id': 1,
+            'fullname': 'Jose Chourio',
+            'email': 'jchouriopirela@gmail.com',
+            'photo': 'http://localhost:8000/photos/file.jpg'
+          }
+        created_at:
+          type: string
+          format: date-time
+          description: Publication creation date
+        updated_at:
+          type: string
+          format: date-time
+          description: Publication update date
+        posted_ago:
+          type: string
+          description: Time since the publication was made
+  400:
+    description: Missing required fields jaja
+    schema:
+      id: ValidationError
+      properties:
+        message:
+          type: string
+          description: Message
+        fields:
+          type: array
+          items:
+            type: object
+            example: {
+              'field': 'Field validation error'
+            }
+            description: Error for each field
+          description: Errors for each field
+  401:
+    description: Unauthorized, token is missing
+    schema:
+      properties:
+        message:
+          type: string
+          description: Message

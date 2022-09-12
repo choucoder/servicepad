@@ -1,0 +1,27 @@
+summary: "List all users"
+description: "This is an API for list all users"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+security:
+- APIKeyHeader: ['x-access-token']
+responses:
+  200:
+    description: List all users registered
+    schema:
+      id: UserListSchema
+      properties:
+        data:
+          type: array
+          description: Users
+          items:
+            schema:
+              id: UserDumpSchema
+  401:
+    description: Unauthorized, token is missing
+    schema:
+      properties:
+        message:
+          type: string
+          description: Message
