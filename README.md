@@ -3,20 +3,50 @@
 Backend knowledge application test, API Rest
 
 ## Installation
-### Install postgresql
+First, clone the repository
+```
+$ git clone https://github.com/choucoder/servicepad.git
+```
+
+### Installation non-docker version
+#### Postgresql installation and configure
 ```
 $ sudo apt install postgresql postgresql-contrib
+
+$ sudo su postgres
+
+$ psql
+
+$ postgres=# \c postgres;
+
+$ postgres=# CREATE USER chou WITH PASSWORD 'calamardo';
+
+$ postgres=# GRANT ALL PRIVILEGES ON DATABASE postgres TO chou;
+
+$ postgres=# exit;
 ```
-### Install required libraries
+#### Required libraries
 ```
+$ cd servicepad
+
+$ sudo apt install python3-venv
+
+$ python3 -m venv .venv
+
+$ source .venv/bin/activate
+
 $ python3 -m pip install -r requirements.txt
 ```
 
+### Installation with Docker
+```
+$ sudo apt install docker container-io docker-compose
+```
+
+
 ## Run Flask API
 
-### Run API
-1. Install postgresql
-2. Create an user with username chou and password calamardo
+### Run API non-docker
 ```
 $ flask db init
 
@@ -27,11 +57,11 @@ $ flask db upgrade
 $ python3 app.py
 ```
 
-### Run with Docker
-1. Install docker and docker-compose and then run:
+### Run API with Docker
 ```
 $ sudo docker-compose up
 ```
+
 ## Run Tests
 ```
 $ pytest

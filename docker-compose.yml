@@ -4,7 +4,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    #command: "gunicorn fileupload.wsgi:application --bind 0.0.0.0:8000 --workers=2"
     command: sh -c "flask db init && flask db migrate -m 'First migration' && flask db upgrade && python3 app.py"
     ports:
       - 8000:8000
