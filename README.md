@@ -37,5 +37,8 @@ $ sudo docker-compose up
 $ pytest
 ```
 
+## Swagger test
+- http://0.0.0.0:8000/apidocs
+
 ## Changelog
 - Version 1.0 : Flask API and user, publication modules
