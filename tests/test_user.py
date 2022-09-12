@@ -43,7 +43,7 @@ class TestUser:
     URL = f"http://localhost:{config('PORT')}/api/v1/users"
 
     def rollback_user_creation(self, email):
-        engine = create_engine(f"postgresql://{config('DB_USERNAME')}:{config('DB_PASSWORD')}@localhost:{config('DB_PORT')}/{config('DB_NAME')}")
+        engine = create_engine(config('DATABASE_URL'))
         conn = engine.connect()
 
         stmt = user_table.delete().where(user_table.c.email==email)

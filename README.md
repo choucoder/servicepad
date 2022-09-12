@@ -3,12 +3,17 @@
 Backend knowledge application test, API Rest
 
 ## Installation
+### Install postgresql
+```
+$ sudo apt install postgresql postgresql-contrib
+```
+### Install required libraries
 ```
 $ python3 -m pip install -r requirements.txt
 ```
 
 ## Run Flask API
-### Run migrations
+Run migrations
 ```
 $ flask db init
 
@@ -23,11 +28,9 @@ $ python3 app.py
 ```
 
 ### Run with Docker
+In the .env file, change the DATABASE_URL host from 0.0.0.0 to DB, Then: 
 ```
-$ docker build -t flask-example .
-
-$ docker run -p 5000:5000 --name flask-example flask-example 
-
+$ sudo docker-compose up
 ```
 ## Run Tests
 ```

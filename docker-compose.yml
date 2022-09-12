@@ -9,7 +9,7 @@ services:
     ports:
       - 8000:8000
     environment:
-      - DATABASE_URL=postgresql://chou:calamardo@db:5432/servicepad
+      - DATABASE_URL=postgresql://chou:calamardo@db:5432/postgres
     expose:
       - 8000
     volumes:
@@ -20,7 +20,7 @@ services:
     image: postgres:12
     restart: always
     environment:
-      POSTGRES_DATABASE: servicepad
+      POSTGRES_DATABASE: postgres
       POSTGRES_USER: chou
       POSTGRES_PASSWORD: calamardo
     volumes:

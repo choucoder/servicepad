@@ -61,13 +61,13 @@ class TestPublication:
     }
     
     def rollback_user_creation(self, id):
-        engine = create_engine(f"postgresql://{config('DB_USERNAME')}:{config('DB_PASSWORD')}@localhost:{config('DB_PORT')}/{config('DB_NAME')}")
+        engine = create_engine(config('DATABASE_URL'))
         conn = engine.connect()
         stmt = user_table.delete().where(user_table.c.id==id)
         conn.execute(stmt)
 
     def rollback_post_creation(self, id):
-        engine = create_engine(f"postgresql://{config('DB_USERNAME')}:{config('DB_PASSWORD')}@localhost:{config('DB_PORT')}/{config('DB_NAME')}")
+        engine = create_engine(config('DATABASE_URL'))
         conn = engine.connect()
         stmt = publication_table.delete().where(publication_table.c.id==id)
         conn.execute(stmt)
