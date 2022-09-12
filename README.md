@@ -13,7 +13,10 @@ $ python3 -m pip install -r requirements.txt
 ```
 
 ## Run Flask API
-Run migrations
+
+### Run API
+1. Install postgresql
+2. Create an user with username chou and password calamardo
 ```
 $ flask db init
 
@@ -21,14 +24,11 @@ $ flask db migrate -m "First migration"
 
 $ flask db upgrade
 
-```
-### Run API
-```
 $ python3 app.py
 ```
 
 ### Run with Docker
-In the .env file, change the DATABASE_URL host from 0.0.0.0 to DB, Then: 
+1. Install docker and docker-compose and then run:
 ```
 $ sudo docker-compose up
 ```
