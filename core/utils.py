@@ -76,4 +76,14 @@ def save_picture(b64img: str) -> str:
 
     img.save(filepath, ext)
 
-    return 'photos/' + filename
+    return filename
+
+
+def remove_picture(filename: str):
+    """Remove a photo from the photo folder"""
+    try:
+        api_dir = config('PHOTO_UPLOAD')
+        filepath = os.path.join(api_dir, filename)
+        os.remove(filepath)
+    except:
+        pass

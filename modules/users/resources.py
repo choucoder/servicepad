@@ -10,7 +10,7 @@ from werkzeug.security import (
 from .models import User
 from .schemas import UserSchema, LoginSchema
 from core.auth import get_token, get_user_by_token, token_required
-from core.utils import save_picture
+from core.utils import remove_picture, save_picture
 from database.connection import db
 
 
@@ -259,6 +259,7 @@ class SingleUserResource(Resource):
             id: User id
         """
         user = User.query.get_or_404(id, description="User not found")
+        filename = user.photo
         if not self.check_permission(request.headers, user):
             return Response(
                 json.dumps({'message': "You cannot delete this user"}),
@@ -267,4 +268,5 @@ class SingleUserResource(Resource):
             )
         db.session.delete(user)
         db.session.commit()
+        remove_picture(filename)
         return Response(status=204, mimetype='application/json')
